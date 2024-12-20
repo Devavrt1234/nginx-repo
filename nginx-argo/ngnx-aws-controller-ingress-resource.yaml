@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nginx-ingress
+  annotations:
+    kubernetes.io/ingress.class: "alb"  # Use AWS ALB ingress controller
+    alb.ingress.kubernetes.io/scheme: internet-facing  # or internal, depending on your requirement
+    alb.ingress.kubernetes.io/group.name: "nginx-alb"  # Group all ingress under the same ALB
+    alb.ingress.kubernetes.io/target-type: ip  # Target IP-based routing (recommended for EKS)
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'  # Listening on HTTP port 80
+spec:
+  rules:
+    - host: k8s-nginxalb-e0d58d6365-1278197489.us-west-2.elb.amazonaws.com # Replace with your domain
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: nginx-service
+                port:
+                  number: 80
